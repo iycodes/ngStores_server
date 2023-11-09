@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Item" ALTER COLUMN "promotion" SET DEFAULT 'HOMETAB1';

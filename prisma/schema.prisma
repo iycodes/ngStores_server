@@ -1,0 +1,227 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  // id      String    @id 
+  email      String    @id @unique
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime? @updatedAt
+  pwHash     String
+  pwSalt     String
+  name       String
+  type       Role      @default(BUYER)
+  orders     Order[]
+  items      Item[]
+  ratings    Rating[]
+  cart       Cart?
+  savedItems String[]
+  storeName  String?
+  itemCount  Int       @default(0)
+}
+
+model Order {
+  buyer      User   @relation(fields: [buyerId], references: [email])
+  buyerId    String
+  orderId    String @id
+  itemId     String
+  date       String
+  quantity   Int
+  color      String
+  size       Size?
+  numberSize Int?
+}
+
+model Cart {
+  owner   User       @relation(fields: [ownerId], references: [email])
+  ownerId String     @id
+  items   CartItem[]
+}
+
+model CartItem {
+  // CartItem Item @relation(fields: [itemId], references: [id])
+  cart       Cart    @relation(fields: [cartId], references: [ownerId], onDelete: Cascade)
+  cartId     String
+  itemId     String  @id
+  // itemOptions       CartItemOptions?
+  quantity   Int
+  color      String?
+  size       String?
+  numberSize Int?
+  // cartItemOptionsId String
+}
+
+// model CartItemOptions {
+//   id    String   @id
+//   item  CartItem @relation(fields: [id], references: [itemId])
+//   color String?
+//   size  Size?
+// }
+
+model Item {
+  id          String       @id
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime?    @updatedAt
+  name        String
+  seller      User         @relation(fields: [sellerId], references: [email])
+  sellerId    String
+  price       Int
+  description String
+  gender      Gender
+  category    Category
+  subCategory SubCategory?
+  thumbnail   String
+  images      String[]
+  rating      Rating[]
+  colors      Color[]
+  // ItemOptions ItemOptions?
+  promotion   promotion    @default(HOMETAB1)
+  // itemNumber  Int
+}
+
+model Color {
+  id     String   @id
+  item   Item     @relation(fields: [itemId], references: [id])
+  itemId String
+  color  String
+  sizes  String[]
+}
+
+// model FashionCategory {
+
+// }
+
+// model ItemOptions {
+//   item     Item      @relation(fields: [itemId], references: [id])
+//   itemId   String    @id
+//   color    String?
+//   size     Size?
+//   quantity quantity?
+// }
+
+// model quantity {
+//   parentItem ItemOptions @relation(fields: [id], references: [itemId])
+//   id         String      @id
+//   S          Int?
+//   M          Int?
+//   L          Int?
+//   XL         Int?
+//   XXL        Int?
+//   XXXL       Int?
+// }
+
+model Rating {
+  item    Item    @relation(fields: [itemId], references: [id])
+  itemId  String
+  user    User    @relation(fields: [userId], references: [email])
+  userId  String
+  rating  Int
+  comment String?
+
+  @@id([itemId, userId])
+}
+
+enum promotion {
+  NONE
+  HOMETAB1
+  HOMEPAGE
+}
+
+enum Role {
+  ADMIN
+  BUYER
+  SELLER
+}
+
+enum Gender {
+  MEN
+  WOMEN
+  BOYS
+  GIRLS
+}
+
+enum lol {
+  LOL
+  OLO
+}
+
+enum SubCategory {
+  SHIRTS
+  CORDUROY_SHIRT
+  POlO
+  T_SHIRTS
+  OFFICE_SHIRT
+  VINTAGE
+  BEACH
+  SWEATSHIRT
+  //
+  JACKETS
+  JEAN_JACKET
+  LEATHER_JACKET
+  BLAZER
+  PUFFER_JACKET
+  //
+  TROUSERS
+  OFFICE_TROUSER
+  JEANS_REGULAR
+  JEANS_BAGGY
+  JEANS_TIGHT
+  CARGO_PANTS
+  LEGGINS
+  JOGGERS
+  PLAY_PANTS
+  CORDUROY_TROUSER
+  CHINOS_TROUSER
+  PALAZZO
+  //
+  SHORTS
+  CARGO_SHORTS
+  BOXERS
+  BEACH_SHORT
+  CORDUROY_SHORT
+  //
+  SKIRTS
+  MINI_SKIRT
+  JEAN_SKIRT
+  //
+  BAGS
+
+  //
+  PYJAMAS
+  SUIT
+}
+
+enum Category {
+  FASHION
+  GROCERY
+  HEALTH_BEAUTY
+  AUTOMOBILE
+  GAMING
+  COMPUTING
+  PHONES_TABLETS
+}
+
+enum Size {
+  S
+  M
+  L
+  XL
+  XXL
+  XXXL
+}
+
+// model Userr {
+//   id    String    @id @default(autoincrement())
+//   posts Postt[]
+// }
+
+// model Postt {
+//   // id       String  @id @default(autoincrement())
+//   author   Userr @relation(fields: [authorId], references: [id])
+//   authorId String @id // relation scalar field  (used in the `@relation` attribute above) 
+// }
